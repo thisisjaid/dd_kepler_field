@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+{ 
+while read line
+do
+echo "Getting DD IDs for members of collection $line"
+curl -s https://www.diskdetective.org/_ouroboros_api/projects/wise/talk/collections/"$line" | jq '.subjects[].zooniverse_id' | sed 's/\"//g' >> data/dd_object_ids_${line}.txt
+num_obj=$(cat data/dd_object_ids_${line}.txt | wc -l)
+cur_obj=0
+echo "Getting WISE IDs for members of collection $line"
+	{ 
+	while read aline
+	do
+	wise_id="$(curl -s https://www.diskdetective.org/_ouroboros_api/projects/wise/talk/subjects/"$aline" | jq '.metadata.wise_id' | sed 's/\"//g')"
+	echo "$aline,$wise_id" >> data/dd_to_wise_ids_${line}.txt
+    ((cur_obj+=1))
+    ((progress=$cur_obj*100/$num_obj)) 
+    echo -ne "$progress% done\r"
+    sleep 1
+	done
+	} < data/dd_object_ids_${line}.txt
+
+done
+} < dd_target_collections.txt
+
