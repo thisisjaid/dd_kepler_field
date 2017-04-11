@@ -35,7 +35,10 @@ for line in ddcollections:
 				array_result = qresult[0].as_array()
 				resultline = str(fields[0])+","+str(fields[1])+","+str(array_result[0][1])+","+str(array_result[0][2])
 			else:
-				sys.exit(1)
+				resultline = str(fields[0])+","+str(fields[1])+",NF,NF,NF,NF,NF,NF"
+				print(resultline,file=results)
+				progress = (curline / nolines)*100
+				continue
 			
 			time.sleep(1)
 
@@ -48,6 +51,8 @@ for line in ddcollections:
 					resultline = resultline+","+str(array_result2[0][1])+","+str(array_result2[0][0])+",1"	
 			else:
 				resultline = resultline+",NA,NA,NA"
+			
+			time.sleep(1)
 			
 			qresult3 = v3.query_object(fields[1],catalog=["EPIC"],radius=0.001*au.deg)
 			if qresult3:
